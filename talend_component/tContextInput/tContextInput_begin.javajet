@@ -79,7 +79,7 @@
 <%	if (contextVarConnName != null) { %>
 		<%=contextVarConnName%>.VAR_NAME = param.getName();
 		<%=contextVarConnName%>.VAR_VALUE = param.getValue();
-		<%=contextVarConnName%>.VAR_IS_CONFIGURED = param.isConfigured();
-		<%=contextVarConnName%>.VAR_IS_PROMPT = param.isPrompt();
-		<%=contextVarConnName%>.VAR_LOAD_FROM_FILE = param.getLoadFromFile();
+		<%=contextVarConnName%>.CONFIGURED_IN_CURR_JOB = param.isConfigured();
+		<%=contextVarConnName%>.IS_PROMPT = param.isPrompt();
+		<%=contextVarConnName%>.SOURCE_FILE = param.getSourceFile();
 <%	} %>

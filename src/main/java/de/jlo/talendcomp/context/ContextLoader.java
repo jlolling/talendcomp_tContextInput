@@ -30,7 +30,7 @@ public class ContextLoader {
 		cp.setValue(properties.getProperty(key, value));
 		cp.setConfigured(true);
 		cp.setPrompt(isPrompt);
-		cp.setLoadFromFile(propertyFileMap.get(key));
+		cp.setSourceFile(propertyFileMap.get(key));
 		jobContextParameters.add(cp);
 	}
 	
@@ -41,7 +41,7 @@ public class ContextLoader {
 			cp.setName(propertyName);
 			cp.setConfigured(false);
 			cp.setValue(properties.getProperty(propertyName));
-			cp.setLoadFromFile(propertyFileMap.get(propertyName));
+			cp.setSourceFile(propertyFileMap.get(propertyName));
 			int index = jobContextParameters.indexOf(cp);
 			if (index == -1) {
 				jobContextParameters.add(cp); // add loaded none-job parameter

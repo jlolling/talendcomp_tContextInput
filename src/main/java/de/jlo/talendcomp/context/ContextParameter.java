@@ -6,7 +6,7 @@ public class ContextParameter implements Comparable<ContextParameter> {
 	private String value = null;
 	private boolean isConfigured = false;
 	private boolean isPrompt = false;
-	private String loadFromFile = null;
+	private String sourceFile = null;
 	
 	public String getName() {
 		return name;
@@ -32,11 +32,11 @@ public class ContextParameter implements Comparable<ContextParameter> {
 	public void setPrompt(boolean isPrompt) {
 		this.isPrompt = isPrompt;
 	}
-	public String getLoadFromFile() {
-		return loadFromFile;
+	public String getSourceFile() {
+		return sourceFile;
 	}
-	public void setLoadFromFile(String loadFromFile) {
-		this.loadFromFile = loadFromFile;
+	public void setSourceFile(String loadFromFile) {
+		this.sourceFile = loadFromFile;
 	}
 	
 	@Override

@@ -24,9 +24,9 @@
       <TABLE READONLY="true"> 
         <COLUMN NAME="VAR_NAME" TYPE="id_String" READONLY="true" CUSTOM="true" LENGTH="8" KEY="true" NULLABLE="false" COMMENT="Name of the context variable"/>  
         <COLUMN NAME="VAR_VALUE" TYPE="id_Object" READONLY="true" CUSTOM="true" KEY="false" NULLABLE="false" COMMENT="Value of the context variable"/>  
-        <COLUMN NAME="VAR_IS_CONFIGURED" TYPE="id_Boolean" READONLY="true" CUSTOM="true" LENGTH="255" NULLABLE="true" COMMENT="Var is a prompt var"/>  
-        <COLUMN NAME="VAR_IS_PROMPT" TYPE="id_Boolean" READONLY="true" CUSTOM="true" LENGTH="255" NULLABLE="true" COMMENT="Var is a prompt var"/>  
-        <COLUMN NAME="VAR_LOAD_FROM_FILE" TYPE="id_String" READONLY="true" CUSTOM="true" LENGTH="255" NULLABLE="true" COMMENT="From which file the value was finally load"/> 
+        <COLUMN NAME="CONFIGURED_IN_CURR_JOB" TYPE="id_Boolean" READONLY="true" CUSTOM="true" LENGTH="255" NULLABLE="true" COMMENT="Var is configured in current job"/>  
+        <COLUMN NAME="IS_PROMPT" TYPE="id_Boolean" READONLY="true" CUSTOM="true" LENGTH="255" NULLABLE="true" COMMENT="Var is a prompt var"/>  
+        <COLUMN NAME="SOURCE_FILE" TYPE="id_String" READONLY="true" CUSTOM="true" LENGTH="255" NULLABLE="true" COMMENT="From which file the value was finally load"/> 
       </TABLE> 
     </PARAMETER>  
     <PARAMETER NAME="LOAD_CONTEXT_FILES" FIELD="CHECK" NUM_ROW="10"> 
@@ -45,7 +45,7 @@
       <DEFAULT>false</DEFAULT> 
     </PARAMETER>  
     <PARAMETER NAME="FILE_INCLUDE_KEY_PATTERN" FIELD="TEXT" REQUIRED="true" NUM_ROW="40" SHOW_IF="(LOAD_CONTEXT_FILES == 'true') and (ALLOW_FILE_INCLUDES == 'true')"> 
-      <DEFAULT>"^file:*"</DEFAULT> 
+      <DEFAULT>"^file_*"</DEFAULT> 
     </PARAMETER> 
   </PARAMETERS>  
   <ADVANCED_PARAMETERS> 
