@@ -82,8 +82,10 @@ public class ContextLoader {
 		// get the files from the parent dir and filter them
 		File dir = config.getDir();
 		File[] files = dir.listFiles(config.getFileFilter());
-		for (File file : files) {
-			loadProperties(config, file);
+		if (files != null) {
+			for (File file : files) {
+				loadProperties(config, file);
+			}
 		}
 	}
 	
