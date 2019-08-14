@@ -1,0 +1,85 @@
+<%@ jet 
+	imports="
+		org.talend.core.model.process.INode
+		org.talend.core.model.process.IProcess
+		org.talend.core.model.process.IContextManager
+		org.talend.core.model.process.IContext
+		org.talend.core.model.process.IContextParameter
+		org.talend.core.model.process.ElementParameterParser 
+		org.talend.core.model.process.IConnection
+		org.talend.core.model.process.IConnectionCategory
+		org.talend.core.model.utils.NodeUtil
+		org.talend.designer.codegen.config.CodeGeneratorArgument
+		java.util.List
+		java.util.ArrayList
+		java.util.Map
+		java.util.Collections
+		java.util.Comparator
+	" 
+%>
+<% 
+	CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+   INode node = (INode)codeGenArgument.getArgument();
+   String cid = node.getUniqueName();
+   boolean loadContext = "true".equals(ElementParameterParser.getValue(node, "__LOAD_CONTEXT_FILES__"));
+   List<Map<String, String>> filterList = (List<Map<String,String>>) ElementParameterParser.getObjectValue(node, "__CONTEXT_FILE_FILTERS__");
+   boolean decryptPasswords = "true".equals(ElementParameterParser.getValue(node, "__DECRYPT_PASSWORDS__"));
+   boolean allowFileIncludes = "true".equals(ElementParameterParser.getValue(node, "__ALLOW_FILE_INCLUDES__"));
+   String fileIncludePattern = ElementParameterParser.getValue(node, "__FILE_INCLUDE_KEY_PATTERN__"); %>
+   de.jlo.talendcomp.context.ContextLoader <%=cid%> = new de.jlo.talendcomp.context.ContextLoader();
+<%	if (loadContext) { %>
+	<%=cid%>.setDecryptPasswords(<%=decryptPasswords%>);
+<%		if (allowFileIncludes) { %>
+	<%=cid%>.setEnableIncludes(true);
+	<%=cid%>.setIncludeKeyFilter(<%=fileIncludePattern%>);
+<%		} %>
+	// add filter list
+<%		if (filterList != null) {
+   		for (Map<String, String> config : filterList) {
+   			String fileFilter = config.get("FILE_FILTER");
+   			boolean ignoreMissing = "true".equals(config.get("IGNORE_MISSING")); %>
+   <%=cid%>.addFileFilter(<%=fileFilter%>, <%=ignoreMissing%>);	
+<%   		}
+		}
+   }
+%>
+	// load properties files
+	try {
+		<%=cid%>.loadProperties();
+	} catch (Exception le) {
+		String message = "Load properties failed: " + le.getMessage();
+		globalMap.put("<%=cid%>_ERROR_MESSAGE", message);
+		throw new Exception(message, le);
+	}
+<%	IProcess process = node.getProcess();
+	IContextManager cm = process.getContextManager();
+	IContext ctx = cm.getDefaultContext(); %>
+	System.out.println("Context: <%=ctx.getName()%>");
+<%	List<IContextParameter> ctxParamList = new ArrayList<IContextParameter>();
+	if (ctx != null) {
+		ctxParamList = ctx.getContextParameterList();
+	} else {
+		ctxParamList = new ArrayList<IContextParameter>(); // dummy list
+	} %>
+	// load job internal context vars and replace job values with loaded values
+<%	for (IContextParameter param : ctxParamList) { %>
+	<%=cid%>.addJobContextParameterValue("<%=param.getName()%>", "<%=param.getValue()%>", <%=param.isPromptNeeded()%>);
+	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>"); 
+<%	}
+	String contextVarConnName = null;
+	List<? extends IConnection> contextVarConns = node.getOutgoingConnections("CONTEXT_VARIABLES");
+	if (contextVarConns != null && contextVarConns.isEmpty() == false) {
+	    IConnection outConn = contextVarConns.get(0);
+	    contextVarConnName = outConn.getName();
+	} %>
+	<%=cid%>.setupContextParameters();
+	List<de.jlo.talendcomp.context.ContextParameter> <%=cid%>_ctxlist = <%=cid%>.getContextParameterValues();
+	for (de.jlo.talendcomp.context.ContextParameter param : <%=cid%>_ctxlist) {
+		context.setProperty(param.getName(), param.getValue());
+<%	if (contextVarConnName != null) { %>
+		<%=contextVarConnName%>.VAR_NAME = param.getName();
+		<%=contextVarConnName%>.VAR_VALUE = param.getValue();
+		<%=contextVarConnName%>.VAR_IS_CONFIGURED = param.isConfigured();
+		<%=contextVarConnName%>.VAR_IS_PROMPT = param.isPrompt();
+		<%=contextVarConnName%>.VAR_LOAD_FROM_FILE = param.getLoadFromFile();
+<%	} %>
