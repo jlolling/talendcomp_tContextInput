@@ -22,6 +22,11 @@ public class ContextLoader {
 	private Pattern includeKeyFilter = null;
 	private boolean decryptPasswords = false;
 	private List<ContextParameter> jobContextParameters = new ArrayList<>();
+	private static boolean already_loaded = false;
+	
+	public static void preventFurtherJobsFromLoading() {
+		already_loaded = true;
+	}
 	
 	public void addJobContextParameterValue(String key, String value, boolean isPrompt) {
 		ContextParameter cp = new ContextParameter();
@@ -79,12 +84,14 @@ public class ContextLoader {
 	}
 	
 	private void loadProperties(FileFilterConfig config) throws Exception {
-		// get the files from the parent dir and filter them
-		File dir = config.getDir();
-		File[] files = dir.listFiles(config.getFileFilter());
-		if (files != null) {
-			for (File file : files) {
-				loadProperties(config, file);
+		if (already_loaded == false) {
+			// get the files from the parent dir and filter them
+			File dir = config.getDir();
+			File[] files = dir.listFiles(config.getFileFilter());
+			if (files != null) {
+				for (File file : files) {
+					loadProperties(config, file);
+				}
 			}
 		}
 	}

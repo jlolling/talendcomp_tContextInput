@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <COMPONENT> 
-  <HEADER AUTHOR="cimt AG" COMPATIBILITY="ALL" DATA_AUTO_PROPAGATE="false" PLATEFORM="ALL" RELEASE_DATE="20190814" SERIAL="" STARTABLE="true" STATUS="RELEASE" VERSION="1.1"> 
+  <HEADER AUTHOR="cimt AG" COMPATIBILITY="ALL" DATA_AUTO_PROPAGATE="false" PLATEFORM="ALL" RELEASE_DATE="20190815" SERIAL="" STARTABLE="true" STATUS="RELEASE" VERSION="1.1"> 
     <SIGNATURE/> 
   </HEADER>  
   <FAMILIES> 
@@ -22,8 +22,8 @@
   <PARAMETERS> 
     <PARAMETER NAME="SCHEMA_CONTEXT_VARIABLES" FIELD="SCHEMA_TYPE" REQUIRED="true" NUM_ROW="5" CONTEXT="CONTEXT_VARIABLES"> 
       <TABLE READONLY="true"> 
-        <COLUMN NAME="VAR_NAME" TYPE="id_String" READONLY="true" CUSTOM="true" LENGTH="8" KEY="true" NULLABLE="false" COMMENT="Name of the context variable"/>  
-        <COLUMN NAME="VAR_VALUE" TYPE="id_Object" READONLY="true" CUSTOM="true" KEY="false" NULLABLE="false" COMMENT="Value of the context variable"/>  
+        <COLUMN NAME="VAR_NAME" TYPE="id_String" READONLY="true" CUSTOM="true" LENGTH="128" KEY="true" NULLABLE="false" COMMENT="Name of the context variable"/>  
+        <COLUMN NAME="VAR_VALUE" TYPE="id_String" READONLY="true" CUSTOM="true" KEY="false" NULLABLE="true" COMMENT="Value of the context variable"/>  
         <COLUMN NAME="CONFIGURED_IN_CURR_JOB" TYPE="id_Boolean" READONLY="true" CUSTOM="true" LENGTH="255" NULLABLE="true" COMMENT="Var is configured in current job"/>  
         <COLUMN NAME="IS_PROMPT" TYPE="id_Boolean" READONLY="true" CUSTOM="true" LENGTH="255" NULLABLE="true" COMMENT="Var is a prompt var"/>  
         <COLUMN NAME="SOURCE_FILE" TYPE="id_String" READONLY="true" CUSTOM="true" LENGTH="255" NULLABLE="true" COMMENT="From which file the value was finally load"/> 
@@ -49,8 +49,8 @@
     </PARAMETER> 
   </PARAMETERS>  
   <ADVANCED_PARAMETERS> 
-    <PARAMETER NAME="RELEASE_LABEL_20190814" FIELD="LABEL" COLOR="0;0;0" NUM_ROW="900">
-      <DEFAULT>Release: 1.1 build at: 20190814</DEFAULT>
+    <PARAMETER NAME="RELEASE_LABEL_20190815" FIELD="LABEL" COLOR="0;0;0" NUM_ROW="900">
+      <DEFAULT>Release: 1.1 build at: 20190815</DEFAULT>
     </PARAMETER>
   </ADVANCED_PARAMETERS>  
   <CODEGENERATION> 

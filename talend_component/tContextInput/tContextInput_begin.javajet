@@ -64,7 +64,27 @@
 	// load job internal context vars and replace job values with loaded values
 <%	for (IContextParameter param : ctxParamList) { %>
 	<%=cid%>.addJobContextParameterValue("<%=param.getName()%>", "<%=param.getValue()%>", <%=param.isPromptNeeded()%>);
-	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>"); 
+<% 	if (param.getType().contains("Date")) { %>
+	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToDate(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+<%		} else if (param.getType().contains("Int")) { %>
+	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToInteger(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+<%		} else if (param.getType().contains("Float")) { %>
+	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToFloat(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+<%		} else if (param.getType().contains("Double")) { %>
+	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToDouble(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+<%		} else if (param.getType().contains("Long")) { %>
+	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToLong(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+<%		} else if (param.getType().contains("Boolean")) { %>
+	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToBoolean(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+<%		} else if (param.getType().contains("String")) { %>
+	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
+<%		} else if (param.getType().contains("File")) { %>
+	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
+<%		} else if (param.getType().contains("Dir")) { %>
+	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
+<%		} else { %>
+	throw new Exception("Cannot assign context variable: <%=param.getName()%> because of unknown type: <%=param.getType()%>");
+<%		} %>
 <%	}
 	String contextVarConnName = null;
 	List<? extends IConnection> contextVarConns = node.getOutgoingConnections("CONTEXT_VARIABLES");
