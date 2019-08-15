@@ -22,7 +22,7 @@ public class TestContextLoad {
 		for (String n : loader.getVariableNames()) {
 			System.out.println(n);
 		}
-		assertEquals(25, loader.countLoadedProperties());
+		assertEquals(28, loader.countLoadedProperties());
 	}
 
 	@Test

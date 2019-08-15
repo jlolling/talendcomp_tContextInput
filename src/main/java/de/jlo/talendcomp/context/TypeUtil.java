@@ -57,11 +57,20 @@ public final class TypeUtil {
 			return null;
 		}
 		try {
+			String dateValue = dateString;
+			String pattern = DEFAULT_DATE_PATTERN;
+			int pos = dateString.indexOf(";");
+			if (pos > 0) {
+				pattern = dateString.substring(0, pos);
+				if (pos < dateString.length() - 1) {
+					dateValue = dateString.substring(pos + 1);
+				}
+			}
 			Date date = null;
 			try {
-				date = GenericDateUtil.parseDate(dateString, DEFAULT_DATE_PATTERN);
+				date = GenericDateUtil.parseDate(dateValue, pattern);
 			} catch (ParseException pe) {
-				date = GenericDateUtil.parseDate(dateString);
+				date = GenericDateUtil.parseDate(dateValue);
 			}
 			return date;
 		} catch (Throwable t) {
