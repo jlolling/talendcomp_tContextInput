@@ -104,7 +104,11 @@
 		context.setProperty(param.getName(), param.getValue());
 <%	if (contextVarConnName != null) { %>
 		<%=contextVarConnName%>.VAR_NAME = param.getName();
-		<%=contextVarConnName%>.VAR_VALUE = param.getValue();
+		if (<%=contextVarConnName%>.VAR_NAME.toLowerCase().contains("passw")) {
+			<%=contextVarConnName%>.VAR_VALUE = "********";
+		} else {
+			<%=contextVarConnName%>.VAR_VALUE = param.getValue();
+		}
 		<%=contextVarConnName%>.CONFIGURED_IN_CURR_JOB = param.isConfigured();
 		<%=contextVarConnName%>.IS_PROMPT = param.isPrompt();
 		<%=contextVarConnName%>.SOURCE_FILE = param.getSourceFile();

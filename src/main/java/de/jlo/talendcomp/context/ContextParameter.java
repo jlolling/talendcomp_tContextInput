@@ -7,6 +7,7 @@ public class ContextParameter implements Comparable<ContextParameter> {
 	private boolean isConfigured = false;
 	private boolean isPrompt = false;
 	private String sourceFile = null;
+	private boolean isPassword = false;
 	
 	public String getName() {
 		return name;
@@ -56,6 +57,12 @@ public class ContextParameter implements Comparable<ContextParameter> {
 	@Override
 	public int compareTo(ContextParameter p) {
 		return name.toLowerCase().compareTo(p.name.toLowerCase());
+	}
+	public boolean isPassword() {
+		return isPassword;
+	}
+	public void setPassword(boolean isPassword) {
+		this.isPassword = isPassword;
 	}
 
 }

@@ -74,7 +74,9 @@ public class ContextLoader {
 	 * @param ignoreMissing allow to find none files, otherwise it will raise an exception
 	 */
 	public void addFileFilter(String pathFilter, boolean ignoreMissing) {
-		fileFilters.add(new FileFilterConfig(pathFilter, ignoreMissing));
+		if (pathFilter != null && pathFilter.trim().isEmpty() == false) {
+			fileFilters.add(new FileFilterConfig(pathFilter, ignoreMissing));
+		}
 	}
 	
 	public void loadProperties() throws Exception {
