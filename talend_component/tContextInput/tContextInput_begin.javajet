@@ -86,6 +86,8 @@
 	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
 <%		} else if (param.getType().contains("Dir")) { %>
 	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
+<%		} else if (param.getType().contains("Password")) { %>
+	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
 <%		} else { %>
 	throw new Exception("Cannot assign context variable: <%=param.getName()%> because of unknown type: <%=param.getType()%>");
 <%		} %>
