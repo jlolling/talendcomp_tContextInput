@@ -66,19 +66,8 @@
 		ctxParamList = new ArrayList<IContextParameter>(); // dummy list
 	} %>
 	// load job internal context vars and replace job values with loaded values
-<%	for (IContextParameter param : ctxParamList) { 
-	String paramValue = param.getValue();
-	if (paramValue != null) {
-		paramValue = paramValue.trim();
-	}
-	if (paramValue != null) {
-		if (paramValue.length() > 1 && paramValue.startsWith("\"") && paramValue.endsWith("\"")) {
-			paramValue = paramValue.substring(1, paramValue.length() - 1);
-		}
-		paramValue = paramValue.replace("\"", "\\\"");
-		paramValue = paramValue.replace("\n", "\\\n");
-	} %>
-	<%=cid%>.addJobContextParameterValue("<%=param.getName()%>", "<%=paramValue%>", <%=param.isPromptNeeded()%>);
+<%	for (IContextParameter param : ctxParamList) { %>
+	<%=cid%>.addJobContextParameterValue("<%=param.getName()%>", context.<%=param.getName()%>, <%=param.isPromptNeeded()%>);
 <% 	if (param.getType().contains("Date")) { %>
 	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToDate(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
 <%		} else if (param.getType().contains("Int")) { %>

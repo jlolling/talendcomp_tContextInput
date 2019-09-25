@@ -3,6 +3,7 @@ package de.jlo.talendcomp.context;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,11 +29,22 @@ public class ContextLoader {
 		already_loaded = true;
 	}
 	
-	public void addJobContextParameterValue(String key, String value, boolean isPrompt) {
+	public static boolean contextLoadAlreadyDone() {
+		return already_loaded;
+	}
+	
+	public void addJobContextParameterValue(String key, Object value, boolean isPrompt) {
 		ContextParameter cp = new ContextParameter();
 		cp.setName(key);
-		// replace the original value with the value loaded from context files 
-		cp.setValue(properties.getProperty(key, value));
+		String valueStr = null;
+		
+		// replace the original value with the value loaded from context files
+		if (value instanceof Date) {
+			valueStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format((Date) value);
+		} else {
+			valueStr = (value != null ? value.toString() : null);
+		}
+		cp.setValue(properties.getProperty(key, valueStr));
 		cp.setConfigured(true);
 		cp.setPrompt(isPrompt);
 		cp.setSourceFile(propertyFileMap.get(key));
