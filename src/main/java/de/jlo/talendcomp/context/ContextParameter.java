@@ -9,11 +9,15 @@ public class ContextParameter implements Comparable<ContextParameter> {
 	private String sourceFile = null;
 	private boolean isPassword = false;
 	
+	public ContextParameter(String name) {
+		this.name = name;
+		if (name == null || name.trim().isEmpty()) {
+			throw new IllegalArgumentException("The name of the context parameter cannot be null or empty!");
+		}
+	}
+	
 	public String getName() {
 		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
 	}
 	public String getValue() {
 		return value;

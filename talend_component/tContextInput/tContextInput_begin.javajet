@@ -101,7 +101,9 @@
 	<%=cid%>.setupContextParameters();
 	List<de.jlo.talendcomp.context.ContextParameter> <%=cid%>_ctxlist = <%=cid%>.getContextParameterValues();
 	for (de.jlo.talendcomp.context.ContextParameter param : <%=cid%>_ctxlist) {
-		context.setProperty(param.getName(), param.getValue());
+		if (param.getValue() != null) {
+			context.setProperty(param.getName(), param.getValue());
+		}
 <%	if (contextVarConnName != null) { %>
 		<%=contextVarConnName%>.VAR_NAME = param.getName();
 		if (<%=contextVarConnName%>.VAR_NAME.toLowerCase().contains("passw")) {

@@ -34,8 +34,11 @@ public class ContextLoader {
 	}
 	
 	public void addJobContextParameterValue(String key, Object value, boolean isPrompt) {
-		ContextParameter cp = new ContextParameter();
-		cp.setName(key);
+		if (key == null || key.trim().isEmpty()) {
+			throw new IllegalArgumentException("Adding context variables to the internal list failed: The key of the variable cannot be null or empty. The variable value was: " + value);
+		}
+		key = key.trim();
+		ContextParameter cp = new ContextParameter(key);
 		String valueStr = null;
 		
 		// replace the original value with the value loaded from context files
@@ -54,8 +57,10 @@ public class ContextLoader {
 	public void setupContextParameters() {
 		// iterate through loaded parameters and add them to the job parameters if not exist in the list
 		for (String propertyName : properties.stringPropertyNames()) {
-			ContextParameter cp = new ContextParameter();
-			cp.setName(propertyName);
+			if (propertyName == null || propertyName.trim().isEmpty()) {
+				continue;
+			}
+			ContextParameter cp = new ContextParameter(propertyName);
 			cp.setConfigured(false);
 			cp.setValue(properties.getProperty(propertyName));
 			cp.setSourceFile(propertyFileMap.get(propertyName));
@@ -115,6 +120,9 @@ public class ContextLoader {
 		lp.load(new FileInputStream(file));
 		// first load not includes
 		for (String propertyName : lp.stringPropertyNames()) {
+			if (propertyName == null || propertyName.trim().isEmpty()) {
+				continue;
+			}
 			if (checkIfKeyIsIncludeKey(propertyName) == false) {
 				String value = lp.getProperty(propertyName);
 				propertyFileMap.put(propertyName, file.getAbsolutePath());
@@ -126,6 +134,9 @@ public class ContextLoader {
 		}
 		if (enableIncludes) {
 			for (String propertyName : lp.stringPropertyNames()) {
+				if (propertyName == null || propertyName.trim().isEmpty()) {
+					continue;
+				}
 				if (checkIfKeyIsIncludeKey(propertyName)) {
 					String value = lp.getProperty(propertyName);
 					// the value should be a file
