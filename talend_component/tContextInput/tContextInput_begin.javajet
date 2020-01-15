@@ -48,7 +48,7 @@
 	try {
 		<%=cid%>.loadProperties();
 <%	if (loadAsSingleton) { %>
-		<%=cid%>.preventFurtherJobsFromLoading();
+		de.jlo.talendcomp.context.ContextLoader.preventFurtherJobsFromLoading();
 <%	} %>
 	} catch (Exception le) {
 		String message = "Load properties failed: " + le.getMessage();
@@ -67,31 +67,43 @@
 	} %>
 	// load job internal context vars and replace job values with loaded values
 <%	for (IContextParameter param : ctxParamList) { %>
-	<%=cid%>.addJobContextParameterValue("<%=param.getName()%>", context.<%=param.getName()%>, <%=param.isPromptNeeded()%>);
+	try { // context variable: <%=param.getName()%>
+		<%=cid%>.addJobContextParameterValue("<%=param.getName()%>", context.<%=param.getName()%>, <%=param.isPromptNeeded()%>);
+   	if (<%=cid%>.isPropertyValueLoadedFromFile("<%=param.getName()%>")) {
 <% 	if (param.getType().contains("Date")) { %>
-	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToDate(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToDate(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
 <%		} else if (param.getType().contains("Int")) { %>
-	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToInteger(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToInteger(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
 <%		} else if (param.getType().contains("Float")) { %>
-	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToFloat(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToFloat(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+<%		} else if (param.getType().contains("Short")) { %>
+			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToShort(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
 <%		} else if (param.getType().contains("Double")) { %>
-	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToDouble(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToDouble(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
 <%		} else if (param.getType().contains("Long")) { %>
-	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToLong(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToLong(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+<%		} else if (param.getType().contains("BigDecimal")) { %>
+			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToBigDecimal(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+<%		} else if (param.getType().contains("BigInteger")) { %>
+			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToBigInteger(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
 <%		} else if (param.getType().contains("Boolean")) { %>
-	context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToBoolean(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
+			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToBoolean(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
 <%		} else if (param.getType().contains("String")) { %>
-	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
+			context.<%=param.getName()%> = (String) <%=cid%>.getContextParamValue("<%=param.getName()%>");
 <%		} else if (param.getType().contains("File")) { %>
-	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
+			context.<%=param.getName()%> = (String) <%=cid%>.getContextParamValue("<%=param.getName()%>");
 <%		} else if (param.getType().contains("Dir")) { %>
-	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
+			context.<%=param.getName()%> = (String) <%=cid%>.getContextParamValue("<%=param.getName()%>");
 <%		} else if (param.getType().contains("Password")) { %>
-	context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
+			context.<%=param.getName()%> = (String) <%=cid%>.getContextParamValue("<%=param.getName()%>");
 <%		} else { %>
-	throw new Exception("Cannot assign context variable: <%=param.getName()%> because of unknown type: <%=param.getType()%>");
+			context.<%=param.getName()%> = <%=cid%>.getContextParamValue("<%=param.getName()%>");
 <%		} %>
-<%	}
+		} // if (<%=cid%>.isPropertyValueLoadedFromFile("<%=param.getName()%>")
+	} catch (Exception ex) {
+		throw new Exception("Error loading value from context variable: <%=param.getName()%>", ex); 
+	}
+<%	} // for (IContextParameter param : ctxParamList)
 	String contextVarConnName = null;
 	List<? extends IConnection> contextVarConns = node.getOutgoingConnections("CONTEXT_VARIABLES");
 	if (contextVarConns != null && contextVarConns.isEmpty() == false) {
@@ -102,16 +114,16 @@
 	List<de.jlo.talendcomp.context.ContextParameter> <%=cid%>_ctxlist = <%=cid%>.getContextParameterValues();
 	for (de.jlo.talendcomp.context.ContextParameter param : <%=cid%>_ctxlist) {
 		if (param.getValue() != null) {
-			context.setProperty(param.getName(), param.getValue());
+			context.setProperty(param.getName(), de.jlo.talendcomp.context.TypeUtil.toString(param.getValue()));
 		}
 <%	if (contextVarConnName != null) { %>
 		<%=contextVarConnName%>.VAR_NAME = param.getName();
 		if (<%=contextVarConnName%>.VAR_NAME.toLowerCase().contains("passw")) {
 			<%=contextVarConnName%>.VAR_VALUE = "********";
 		} else {
-			<%=contextVarConnName%>.VAR_VALUE = param.getValue();
+			<%=contextVarConnName%>.VAR_VALUE = de.jlo.talendcomp.context.TypeUtil.toString(param.getValue());
 		}
 		<%=contextVarConnName%>.CONFIGURED_IN_CURR_JOB = param.isConfigured();
 		<%=contextVarConnName%>.IS_PROMPT = param.isPrompt();
-		<%=contextVarConnName%>.SOURCE_FILE = param.getSourceFile();
+		<%=contextVarConnName%>.SOURCE_FILE = (param.getSourceFile() != null ? param.getSourceFile() : "");
 <%	} %>

@@ -3,7 +3,7 @@ package de.jlo.talendcomp.context;
 public class ContextParameter implements Comparable<ContextParameter> {
 	
 	private String name = null;
-	private String value = null;
+	private Object value = null;
 	private boolean isConfigured = false;
 	private boolean isPrompt = false;
 	private String sourceFile = null;
@@ -19,10 +19,10 @@ public class ContextParameter implements Comparable<ContextParameter> {
 	public String getName() {
 		return name;
 	}
-	public String getValue() {
+	public Object getValue() {
 		return value;
 	}
-	public void setValue(String value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 	public boolean isConfigured() {
@@ -62,9 +62,11 @@ public class ContextParameter implements Comparable<ContextParameter> {
 	public int compareTo(ContextParameter p) {
 		return name.toLowerCase().compareTo(p.name.toLowerCase());
 	}
+	
 	public boolean isPassword() {
 		return isPassword;
 	}
+	
 	public void setPassword(boolean isPassword) {
 		this.isPassword = isPassword;
 	}

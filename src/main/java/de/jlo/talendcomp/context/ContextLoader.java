@@ -3,7 +3,6 @@ package de.jlo.talendcomp.context;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -39,23 +38,26 @@ public class ContextLoader {
 		}
 		key = key.trim();
 		ContextParameter cp = new ContextParameter(key);
-		String valueStr = null;
-		
-		// replace the original value with the value loaded from context files
-		if (value instanceof Date) {
-			valueStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format((Date) value);
+		if (properties.getProperty(key) != null) {
+			cp.setValue(properties.getProperty(key));
 		} else {
-			valueStr = (value != null ? value.toString() : null);
+			cp.setValue(value);
 		}
-		cp.setValue(properties.getProperty(key, valueStr));
 		cp.setConfigured(true);
 		cp.setPrompt(isPrompt);
 		cp.setSourceFile(propertyFileMap.get(key));
 		jobContextParameters.add(cp);
 	}
 	
+	public boolean isPropertyValueLoadedFromFile(String key) {
+		if (properties.getProperty(key) != null) {
+			return true;
+		}
+		return false;
+	}
+	
 	public void setupContextParameters() {
-		// iterate through loaded parameters and add them to the job parameters if not exist in the list
+		// iterate through loaded parameters and add them to the job parameters if they not exist in the list
 		for (String propertyName : properties.stringPropertyNames()) {
 			if (propertyName == null || propertyName.trim().isEmpty()) {
 				continue;
@@ -76,7 +78,7 @@ public class ContextLoader {
 		return jobContextParameters;
 	}
 	
-	public String getContextParamValue(String key) {
+	public Object getContextParamValue(String key) {
 		for (ContextParameter p : jobContextParameters) {
 			if (p.getName().equals(key)) {
 				return p.getValue();
