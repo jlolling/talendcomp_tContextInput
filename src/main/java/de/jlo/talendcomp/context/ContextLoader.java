@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class ContextLoader {
 
 	private Map<String, String> propertyFileMap = new HashMap<>();
-	private Properties properties = new Properties();
+	private Properties propertiesFromFiles = new Properties();
 	private List<FileFilterConfig> fileFilters = new ArrayList<>();
 	private boolean enableIncludes = false;
 	private Pattern includeKeyFilter = null;
@@ -38,8 +38,8 @@ public class ContextLoader {
 		}
 		key = key.trim();
 		ContextParameter cp = new ContextParameter(key);
-		if (properties.getProperty(key) != null) {
-			cp.setValue(properties.getProperty(key));
+		if (propertiesFromFiles.getProperty(key) != null) {
+			cp.setValue(propertiesFromFiles.getProperty(key));
 		} else {
 			cp.setValue(value);
 		}
@@ -50,7 +50,7 @@ public class ContextLoader {
 	}
 	
 	public boolean isPropertyValueLoadedFromFile(String key) {
-		if (properties.getProperty(key) != null) {
+		if (propertiesFromFiles.getProperty(key) != null) {
 			return true;
 		}
 		return false;
@@ -58,13 +58,13 @@ public class ContextLoader {
 	
 	public void setupContextParameters() {
 		// iterate through loaded parameters and add them to the job parameters if they not exist in the list
-		for (String propertyName : properties.stringPropertyNames()) {
+		for (String propertyName : propertiesFromFiles.stringPropertyNames()) {
 			if (propertyName == null || propertyName.trim().isEmpty()) {
 				continue;
 			}
 			ContextParameter cp = new ContextParameter(propertyName);
 			cp.setConfigured(false);
-			cp.setValue(properties.getProperty(propertyName));
+			cp.setValue(propertiesFromFiles.getProperty(propertyName));
 			cp.setSourceFile(propertyFileMap.get(propertyName));
 			int index = jobContextParameters.indexOf(cp);
 			if (index == -1) {
@@ -131,7 +131,7 @@ public class ContextLoader {
 				if (decryptPasswords && propertyName.toLowerCase().contains("password")) {
 					value = TalendContextPasswordUtil.decryptPassword(value);
 				}
-				properties.setProperty(propertyName, value);
+				propertiesFromFiles.setProperty(propertyName, value);
 			}
 		}
 		if (enableIncludes) {
@@ -158,7 +158,7 @@ public class ContextLoader {
 	
 	public List<String> getVariableNames() {
 		List<String> list = new ArrayList<>();
-		for (Object key : properties.keySet()) {
+		for (Object key : propertiesFromFiles.keySet()) {
 			list.add((String) key);
 		}
 		return list;
@@ -189,14 +189,18 @@ public class ContextLoader {
 	}
 	
 	public int countLoadedProperties() {
-		return properties.size();
+		return propertiesFromFiles.size();
+	}
+	
+	public int countJobContextVars() {
+		return jobContextParameters.size();
 	}
 	
 	public String getValueAsString(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		if (missingAllowed == false && properties.containsKey(key) == false) {
+		if (missingAllowed == false && propertiesFromFiles.containsKey(key) == false) {
 			throw new Exception("Variable: " + key + " not not available in the loaded context variables but configured as mandatory!");
 		}
-		String value = properties.getProperty(key);
+		String value = propertiesFromFiles.getProperty(key);
 		if (value == null && nullAllowed == false) {
 			throw new Exception("Variable: " + key + " is null but null is not allowed!");
 		}

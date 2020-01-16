@@ -38,4 +38,20 @@ public class TestContextLoad {
 		assertEquals(17, loader.countLoadedProperties());
 	}
 
+	@Test
+	public void testContextLoadWithIncludesAndAdditionalVars() throws Exception {
+		ContextLoader loader = new ContextLoader();
+		loader.addFileFilter("/Data/Talend/testdata/context/context_includes.properties", false);
+		loader.setEnableIncludes(true);
+		loader.setIncludeKeyFilter("^file_");
+		loader.loadProperties();
+		for (String n : loader.getVariableNames()) {
+			System.out.println(n);
+		}
+		loader.addJobContextParameterValue("build_in_1", new Object(), false);
+		loader.setupContextParameters();
+		assertEquals(17, loader.countLoadedProperties());
+		assertEquals(18, loader.countJobContextVars());
+	}
+
 }
