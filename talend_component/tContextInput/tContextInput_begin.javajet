@@ -27,6 +27,7 @@
    boolean allowFileIncludes = "true".equals(ElementParameterParser.getValue(node, "__ALLOW_FILE_INCLUDES__"));
    boolean loadAsSingleton = "true".equals(ElementParameterParser.getValue(node, "__LOAD_SINGLETON__"));
    String fileIncludePattern = ElementParameterParser.getValue(node, "__FILE_INCLUDE_KEY_PATTERN__"); %>
+   System.out.println("Context: " + contextStr);
    de.jlo.talendcomp.context.ContextLoader <%=cid%> = new de.jlo.talendcomp.context.ContextLoader();
 <%	if (loadContext) { %>
 	<%=cid%>.setDecryptPasswords(<%=decryptPasswords%>);
