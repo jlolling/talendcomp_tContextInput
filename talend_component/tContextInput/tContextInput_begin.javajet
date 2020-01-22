@@ -57,9 +57,8 @@
 	}
 <%	IProcess process = node.getProcess();
 	IContextManager cm = process.getContextManager();
-	IContext ctx = cm.getDefaultContext(); %>
-	System.out.println("Context: <%=ctx.getName()%>");
-<%	List<IContextParameter> ctxParamList = new ArrayList<IContextParameter>();
+	IContext ctx = cm.getDefaultContext();
+	List<IContextParameter> ctxParamList = new ArrayList<IContextParameter>();
 	if (ctx != null) {
 		ctxParamList = ctx.getContextParameterList();
 	} else {
