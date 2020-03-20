@@ -13,8 +13,12 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 public class ContextLoader {
 
+	private static final Logger LOG = Logger.getLogger(ContextLoader.class);
 	private Map<String, String> propertyFileMap = new HashMap<>();
 	private Properties propertiesFromFiles = new Properties();
 	private List<FileFilterConfig> fileFilters = new ArrayList<>();
@@ -26,6 +30,18 @@ public class ContextLoader {
 	
 	public static void preventFurtherJobsFromLoading() {
 		already_loaded = true;
+	}
+	
+	public static void setDebug(Boolean debug) {
+		try {
+			if (debug != null && debug.booleanValue()) {
+				LOG.setLevel(Level.DEBUG);
+			} else {
+				LOG.setLevel(Level.INFO);
+			}
+		} catch (Throwable t) {
+			// ignore
+		}
 	}
 	
 	public static boolean contextLoadAlreadyDone() {
@@ -57,6 +73,7 @@ public class ContextLoader {
 	}
 	
 	public void setupContextParameters() {
+		LOG.debug("setupContextParameters...");
 		// iterate through loaded parameters and add them to the job parameters if they not exist in the list
 		for (String propertyName : propertiesFromFiles.stringPropertyNames()) {
 			if (propertyName == null || propertyName.trim().isEmpty()) {
@@ -106,6 +123,7 @@ public class ContextLoader {
 	
 	private void loadProperties(FileFilterConfig config) throws Exception {
 		if (already_loaded == false) {
+			LOG.debug("loadProperties config: " + config.toString());
 			// get the files from the parent dir and filter them
 			File dir = config.getDir();
 			File[] files = dir.listFiles(config.getFileFilter());
@@ -118,6 +136,7 @@ public class ContextLoader {
 	}
 	
 	private void loadProperties(FileFilterConfig parentConfig, File file) throws Exception {
+		LOG.debug("loadProperties config: " + parentConfig.toString() + " file: " + file.getAbsolutePath());
 		Properties lp = new Properties();
 		lp.load(new FileInputStream(file));
 		// first load not includes
@@ -135,6 +154,7 @@ public class ContextLoader {
 			}
 		}
 		if (enableIncludes) {
+			LOG.debug("loadProperties config: " + parentConfig.toString() + " file: " + file.getAbsolutePath() + " load includes...");
 			for (String propertyName : lp.stringPropertyNames()) {
 				if (propertyName == null || propertyName.trim().isEmpty()) {
 					continue;

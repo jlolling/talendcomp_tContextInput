@@ -51,8 +51,8 @@ public class FileFilterConfig {
 			return new FileFilter() {
 				
 				@Override
-				public boolean accept(File pathname) {
-					return pathname.isFile();
+				public boolean accept(File file) {
+					return file.isFile();
 				}
 			};
 		}
