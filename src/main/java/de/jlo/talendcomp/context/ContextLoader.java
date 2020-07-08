@@ -13,34 +13,29 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 public class ContextLoader {
 
-	private static final Logger LOG = Logger.getLogger(ContextLoader.class);
 	private Map<String, String> propertyFileMap = new HashMap<>();
 	private Properties propertiesFromFiles = new Properties();
+	private Properties propertiesFromFilesWithReplacements = new Properties();
 	private List<FileFilterConfig> fileFilters = new ArrayList<>();
 	private boolean enableIncludes = false;
 	private Pattern includeKeyFilter = null;
 	private boolean decryptPasswords = false;
 	private List<ContextParameter> jobContextParameters = new ArrayList<>();
 	private static boolean already_loaded = false;
+	private Map<String, String> valuePlaceholders = new HashMap<>();
 	
 	public static void preventFurtherJobsFromLoading() {
 		already_loaded = true;
 	}
 	
-	public static void setDebug(Boolean debug) {
-		try {
-			if (debug != null && debug.booleanValue()) {
-				LOG.setLevel(Level.DEBUG);
-			} else {
-				LOG.setLevel(Level.INFO);
+	public void addValueReplacement(String placeHolder, String replacement) {
+		if (placeHolder != null) {
+			if (replacement == null) {
+				replacement = "";
 			}
-		} catch (Throwable t) {
-			// ignore
+			valuePlaceholders.put(placeHolder, replacement);
 		}
 	}
 	
@@ -48,7 +43,26 @@ public class ContextLoader {
 		return already_loaded;
 	}
 	
-	public void addJobContextParameterValue(String key, Object value, boolean isPrompt) {
+	public String applyValueReplacements(String variableName, String strValue) {
+		if (strValue != null) {
+			boolean changed = false;
+			String newValue = strValue;
+			for (Map.Entry<String, String> entry : valuePlaceholders.entrySet()) {
+				if (newValue.contains(entry.getKey())) {
+					changed = true;
+				}
+				newValue = newValue.replace(entry.getKey(), entry.getValue());
+			}
+			if (changed) {
+				propertiesFromFilesWithReplacements.put(variableName, newValue);
+			}
+			return newValue;
+		} else {
+			return null;
+		}
+	}
+	
+	public ContextParameter addJobContextParameterValue(String key, Object value, boolean isPrompt) {
 		if (key == null || key.trim().isEmpty()) {
 			throw new IllegalArgumentException("Adding context variables to the internal list failed: The key of the variable cannot be null or empty. The variable value was: " + value);
 		}
@@ -57,12 +71,17 @@ public class ContextLoader {
 		if (propertiesFromFiles.getProperty(key) != null) {
 			cp.setValue(propertiesFromFiles.getProperty(key));
 		} else {
-			cp.setValue(value);
+			if (value instanceof String) {
+				cp.setValue(applyValueReplacements(key, (String) value)); 
+			} else {
+				cp.setValue(value);
+			}
 		}
 		cp.setConfigured(true);
 		cp.setPrompt(isPrompt);
 		cp.setSourceFile(propertyFileMap.get(key));
 		jobContextParameters.add(cp);
+		return cp;
 	}
 	
 	public boolean isPropertyValueLoadedFromFile(String key) {
@@ -72,8 +91,14 @@ public class ContextLoader {
 		return false;
 	}
 	
+	public boolean containsPropertyValueReplacedPlaceholders(String key) {
+		if (propertiesFromFilesWithReplacements.getProperty(key) != null) {
+			return true;
+		}
+		return false;
+	}
+
 	public void setupContextParameters() {
-		LOG.debug("setupContextParameters...");
 		// iterate through loaded parameters and add them to the job parameters if they not exist in the list
 		for (String propertyName : propertiesFromFiles.stringPropertyNames()) {
 			if (propertyName == null || propertyName.trim().isEmpty()) {
@@ -123,20 +148,25 @@ public class ContextLoader {
 	
 	private void loadProperties(FileFilterConfig config) throws Exception {
 		if (already_loaded == false) {
-			LOG.debug("loadProperties config: " + config.toString());
 			// get the files from the parent dir and filter them
 			File dir = config.getDir();
 			File[] files = dir.listFiles(config.getFileFilter());
 			if (files != null) {
+				if (config.isIgnoreMissing() == false && files.length == 0) {
+					throw new Exception("File filter: " + config + " does not find files and is configured as do not ignore missing files.");
+				}
 				for (File file : files) {
 					loadProperties(config, file);
+				}
+			} else {
+				if (config.isIgnoreMissing() == false) {
+					throw new Exception("File filter: " + config + " does not find files and is configured as do not ignore missing files.");
 				}
 			}
 		}
 	}
 	
 	private void loadProperties(FileFilterConfig parentConfig, File file) throws Exception {
-		LOG.debug("loadProperties config: " + parentConfig.toString() + " file: " + file.getAbsolutePath());
 		Properties lp = new Properties();
 		lp.load(new FileInputStream(file));
 		// first load not includes
@@ -150,11 +180,10 @@ public class ContextLoader {
 				if (decryptPasswords && propertyName.toLowerCase().contains("password")) {
 					value = TalendContextPasswordUtil.decryptPassword(value);
 				}
-				propertiesFromFiles.setProperty(propertyName, value);
+				propertiesFromFiles.setProperty(propertyName, applyValueReplacements(propertyName, value));
 			}
 		}
 		if (enableIncludes) {
-			LOG.debug("loadProperties config: " + parentConfig.toString() + " file: " + file.getAbsolutePath() + " load includes...");
 			for (String propertyName : lp.stringPropertyNames()) {
 				if (propertyName == null || propertyName.trim().isEmpty()) {
 					continue;

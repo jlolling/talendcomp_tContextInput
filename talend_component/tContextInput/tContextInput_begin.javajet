@@ -26,11 +26,10 @@
    boolean decryptPasswords = "true".equals(ElementParameterParser.getValue(node, "__DECRYPT_PASSWORDS__"));
    boolean allowFileIncludes = "true".equals(ElementParameterParser.getValue(node, "__ALLOW_FILE_INCLUDES__"));
    boolean loadAsSingleton = "true".equals(ElementParameterParser.getValue(node, "__LOAD_SINGLETON__"));
-   boolean debug = "true".equals(ElementParameterParser.getValue(node, "__DEBUG__"));
+   List<Map<String, String>> replacerList = (List<Map<String,String>>) ElementParameterParser.getObjectValue(node, "__PARAM_REPLACEMENT__");
    String fileIncludePattern = ElementParameterParser.getValue(node, "__FILE_INCLUDE_KEY_PATTERN__"); %>
    System.out.println("Context: " + contextStr);
    de.jlo.talendcomp.context.ContextLoader <%=cid%> = new de.jlo.talendcomp.context.ContextLoader();
-   de.jlo.talendcomp.context.ContextLoader.setDebug(<%=debug%>);
 <%	if (loadContext) { %>
 	<%=cid%>.setDecryptPasswords(<%=decryptPasswords%>);
 <%		if (allowFileIncludes) { %>
@@ -43,6 +42,16 @@
    			String fileFilter = config.get("FILE_FILTER");
    			boolean ignoreMissing = "true".equals(config.get("IGNORE_MISSING")); %>
    <%=cid%>.addFileFilter(<%=fileFilter%>, <%=ignoreMissing%>);	
+<%   		}
+		}
+   }
+%>
+	// add value replacements
+<%		if (replacerList != null) {
+   		for (Map<String, String> replacer : replacerList) {
+   			String placeHolder = replacer.get("PLACEHOLDER");
+   			String value = replacer.get("VALUE"); %>
+   <%=cid%>.addValueReplacement(<%=placeHolder%>, <%=value%>);
 <%   		}
 		}
    }

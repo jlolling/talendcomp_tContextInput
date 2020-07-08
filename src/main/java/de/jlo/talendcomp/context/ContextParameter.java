@@ -4,6 +4,7 @@ public class ContextParameter implements Comparable<ContextParameter> {
 	
 	private String name = null;
 	private Object value = null;
+	private String originalValue = null;
 	private boolean isConfigured = false;
 	private boolean isPrompt = false;
 	private String sourceFile = null;

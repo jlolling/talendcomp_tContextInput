@@ -1,6 +1,7 @@
 package de.jlo.talendcomp.context;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -12,6 +13,30 @@ public class TestContextLoad {
 		loader.addFileFilter("/Data/Talend/testdata/context/*.properties", false);
 		loader.loadProperties();
 		assertEquals(28, loader.countLoadedProperties());
+	}
+
+	@Test
+	public void testContextCheckMissingFiles() throws Exception {
+		ContextLoader loader = new ContextLoader();
+		loader.addFileFilter("/Data/Talend/testdata/context/missing.properties", false);
+		try {
+			loader.loadProperties();
+			assertTrue("missing file not detected", false);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+	}
+
+	@Test
+	public void testContextLoadReplace() throws Exception {
+		ContextLoader loader = new ContextLoader();
+		loader.addValueReplacement("{{ph1}}", "ph1-value");
+		loader.addValueReplacement("{{ph2}}", "ph2-value");
+		loader.addFileFilter("/Data/Talend/testdata/context/placeholders.properties", false);
+		loader.loadProperties();
+		String expected = "value ph1-value ph2-value";
+		String actual = loader.getValueAsString("key1", false, false);
+		assertEquals("Value wrong", expected, actual);
 	}
 
 	@Test
