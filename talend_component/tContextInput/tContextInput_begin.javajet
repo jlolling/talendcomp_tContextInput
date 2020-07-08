@@ -47,14 +47,13 @@
    }
 %>
 	// add value replacements
-<%		if (replacerList != null) {
-   		for (Map<String, String> replacer : replacerList) {
-   			String placeHolder = replacer.get("PLACEHOLDER");
-   			String value = replacer.get("VALUE"); %>
+<%	if (replacerList != null) {
+   	for (Map<String, String> replacer : replacerList) {
+   		String placeHolder = replacer.get("PLACEHOLDER");
+   		String value = replacer.get("VALUE"); %>
    <%=cid%>.addValueReplacement(<%=placeHolder%>, <%=value%>);
-<%   		}
-		}
-   }
+<%   	}
+	}
 %>
 	// load properties files
 	try {
