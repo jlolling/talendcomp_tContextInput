@@ -24,11 +24,24 @@
    boolean loadContext = "true".equals(ElementParameterParser.getValue(node, "__LOAD_CONTEXT_FILES__"));
    List<Map<String, String>> filterList = (List<Map<String,String>>) ElementParameterParser.getObjectValue(node, "__CONTEXT_FILE_FILTERS__");
    boolean decryptPasswords = "true".equals(ElementParameterParser.getValue(node, "__DECRYPT_PASSWORDS__"));
+   boolean setMasterPw = "true".equals(ElementParameterParser.getValue(node, "__SET_MASTER_PASSWORD__"));
+   String masterPw = ElementParameterParser.getValue(node, "__MASTER_PASSWORD__");
+   if (masterPw == null || masterPw.trim().isEmpty()) {
+   	masterPw = "null";
+   }
    boolean allowFileIncludes = "true".equals(ElementParameterParser.getValue(node, "__ALLOW_FILE_INCLUDES__"));
    boolean loadAsSingleton = "true".equals(ElementParameterParser.getValue(node, "__LOAD_SINGLETON__"));
    List<Map<String, String>> replacerList = (List<Map<String,String>>) ElementParameterParser.getObjectValue(node, "__PARAM_REPLACEMENT__");
    String fileIncludePattern = ElementParameterParser.getValue(node, "__FILE_INCLUDE_KEY_PATTERN__"); %>
    System.out.println("Context: " + contextStr);
+<%	if (setMasterPw) { %>
+	{
+		String masterPwd = <%=masterPw%>;
+		if (masterPwd != null && masterPwd.trim().isEmpty() == false) {
+			de.jlo.talendcomp.context.TalendContextPasswordUtil.setMasterPassword(routines.system.PasswordEncryptUtil.decryptPassword(masterPwd));
+		}
+	}
+<%	} %>
    de.jlo.talendcomp.context.ContextLoader <%=cid%> = new de.jlo.talendcomp.context.ContextLoader();
 <%	if (loadContext) { %>
 	<%=cid%>.setDecryptPasswords(<%=decryptPasswords%>);

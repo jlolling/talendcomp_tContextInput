@@ -10,18 +10,19 @@ import javax.crypto.spec.DESKeySpec;
 public class TalendContextPasswordUtil {
 
     public static String ENCRYPT_KEY = "Encrypt"; //$NON-NLS-1$
-
     private static String rawKey = "Talend-Key"; //$NON-NLS-1$
-
     private static SecretKey key = null;
-
     private static SecureRandom secureRandom = new SecureRandom();
-
     private static String CHARSET = "UTF-8";
+    
+    public static void setMasterPassword(String passwd) {
+    	if (passwd != null && passwd.trim().isEmpty() == false) {
+    		rawKey = passwd.trim();
+    	}
+    }
 
     private static SecretKey getSecretKey() throws Exception {
         if (key == null) {
-
             byte rawKeyData[] = rawKey.getBytes(CHARSET);
             DESKeySpec dks = new DESKeySpec(rawKeyData);
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES"); //$NON-NLS-1$

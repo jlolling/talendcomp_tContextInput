@@ -46,17 +46,16 @@ public class ContextLoader {
 	public String applyValueReplacements(String variableName, String strValue) {
 		if (strValue != null) {
 			boolean changed = false;
-			String newValue = strValue;
 			for (Map.Entry<String, String> entry : valuePlaceholders.entrySet()) {
-				if (newValue.contains(entry.getKey())) {
+				if (strValue.contains(entry.getKey())) {
 					changed = true;
 				}
-				newValue = newValue.replace(entry.getKey(), entry.getValue());
+				strValue = strValue.replace(entry.getKey(), entry.getValue());
 			}
 			if (changed) {
-				propertiesFromFilesWithReplacements.put(variableName, newValue);
+				propertiesFromFilesWithReplacements.put(variableName, strValue);
 			}
-			return newValue;
+			return strValue;
 		} else {
 			return null;
 		}
@@ -177,7 +176,7 @@ public class ContextLoader {
 			if (checkIfKeyIsIncludeKey(propertyName) == false) {
 				String value = lp.getProperty(propertyName);
 				propertyFileMap.put(propertyName, file.getAbsolutePath());
-				if (decryptPasswords && propertyName.toLowerCase().contains("password")) {
+				if (decryptPasswords && propertyName.toLowerCase().contains("passwor")) {
 					value = TalendContextPasswordUtil.decryptPassword(value);
 				}
 				propertiesFromFiles.setProperty(propertyName, applyValueReplacements(propertyName, value));
