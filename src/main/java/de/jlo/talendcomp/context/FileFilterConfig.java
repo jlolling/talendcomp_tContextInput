@@ -13,6 +13,9 @@ public class FileFilterConfig {
 	private boolean ignoreMissing = false;
 	
 	public FileFilterConfig(String filePathFilter, boolean ignoreMissing) {
+		if (filePathFilter == null || filePathFilter.trim().isEmpty()) {
+			throw new IllegalArgumentException("filePathFilter cannot be null or empty");
+		}
 		File test = new File(filePathFilter);
 		// check if the filter refers to a directory
 		if (test.exists()) {
@@ -64,6 +67,13 @@ public class FileFilterConfig {
 	
 	public String getFilterOrName() {
 		return filter;
+	}
+	
+	public void setFilterOrName(String filter) {
+		if (filter == null || filter.trim().isEmpty()) {
+			throw new IllegalArgumentException("filter cannot be null or empty");
+		}
+		this.filter = filter;
 	}
 	
 	public boolean isWildcardFilter() {

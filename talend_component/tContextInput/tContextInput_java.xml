@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <COMPONENT> 
-  <HEADER AUTHOR="cimt AG" COMPATIBILITY="ALL" DATA_AUTO_PROPAGATE="false" PLATEFORM="ALL" RELEASE_DATE="20200709" SERIAL="" STARTABLE="true" STATUS="RELEASE" VERSION="2.1"> 
+  <HEADER AUTHOR="cimt AG" COMPATIBILITY="ALL" DATA_AUTO_PROPAGATE="false" PLATEFORM="ALL" RELEASE_DATE="20200723" SERIAL="" STARTABLE="true" STATUS="RELEASE" VERSION="3.0"> 
     <SIGNATURE/> 
   </HEADER>  
   <FAMILIES> 
@@ -45,6 +45,9 @@
         <ITEM NAME="IGNORE_MISSING" FIELD="CHECK" VALUE="false"/> 
       </ITEMS> 
     </PARAMETER>  
+    <PARAMETER NAME="APPLY_REPLACEMENTS_TO_FILTER" FIELD="CHECK" NUM_ROW="25" SHOW_IF="LOAD_CONTEXT_FILES == 'true'"> 
+      <DEFAULT>false</DEFAULT> 
+    </PARAMETER>  
     <PARAMETER NAME="DECRYPT_PASSWORDS" FIELD="CHECK" NUM_ROW="30" SHOW_IF="LOAD_CONTEXT_FILES == 'true'"> 
       <DEFAULT>false</DEFAULT> 
     </PARAMETER>  
@@ -52,7 +55,7 @@
       <DEFAULT>false</DEFAULT> 
     </PARAMETER>  
     <PARAMETER NAME="PW_HINT" FIELD="LABEL" COLOR="0;0;0" NUM_ROW="32" SHOW_IF="(LOAD_CONTEXT_FILES == 'true') and (SET_MASTER_PASSWORD == 'true')"> 
-      <DEFAULT>This affects also all other tContextInput components in this job hierarchie. It enough to set it in the very first tContextInput component.</DEFAULT> 
+      <DEFAULT>This affects also all other tContextInput components in this job hierarchy. It enough to set it in the very first tContextInput component.</DEFAULT> 
     </PARAMETER>  
     <PARAMETER NAME="MASTER_PASSWORD" FIELD="PASSWORD" NUM_ROW="35" REQUIRED="true" SHOW_IF="(LOAD_CONTEXT_FILES == 'true') and (SET_MASTER_PASSWORD == 'true')"> 
       <DEFAULT/> 
@@ -68,16 +71,23 @@
     <PARAMETER NAME="PARAM_REPLACEMENT" FIELD="TABLE" NUM_ROW="20" NB_LINES="10"> 
       <ITEMS> 
         <ITEM NAME="PLACEHOLDER" FIELD="String" VALUE="&quot;{parameterName}&quot;"/>  
-        <ITEM NAME="VALUE" FIELD="String" VALUE="&quot;parameterValue&quot;"/> 
+        <ITEM NAME="VALUE" FIELD="String" VALUE="&quot;parameterValue&quot;"/>  
+        <ITEM NAME="VALUE_CASE_CHANGE" FIELD="CLOSED_LIST"> 
+          <ITEMS DEFAULT="UNCHANGED"> 
+            <ITEM NAME="UNCHANGED" VALUE="UNCHANGED"/>  
+            <ITEM NAME="UPPERCASE" VALUE="UPPERCASE"/>  
+            <ITEM NAME="LOWERCASE" VALUE="LOWERCASE"/> 
+          </ITEMS> 
+        </ITEM> 
       </ITEMS> 
     </PARAMETER>  
-    <PARAMETER NAME="RELEASE_LABEL_20200709" FIELD="LABEL" COLOR="0;0;0" NUM_ROW="900">
-      <DEFAULT>Release: 2.1 build at: 20200709</DEFAULT>
+    <PARAMETER NAME="RELEASE_LABEL_20200723" FIELD="LABEL" COLOR="0;0;0" NUM_ROW="900">
+      <DEFAULT>Release: 3.0 build at: 20200723</DEFAULT>
     </PARAMETER>
   </ADVANCED_PARAMETERS>  
   <CODEGENERATION> 
     <IMPORTS> 
-      <IMPORT NAME="jlo-talendcomp-contextinput" MODULE="jlo-talendcomp-contextinput-2.1.jar" MVN="mvn:org.talend.libraries/jlo-talendcomp-contextinput-2.1/6.0.0-SNAPSHOT" REQUIRED="true"/>
+      <IMPORT NAME="jlo-talendcomp-contextinput" MODULE="jlo-talendcomp-contextinput-3.0.jar" MVN="mvn:org.talend.libraries/jlo-talendcomp-contextinput-3.0/6.0.0-SNAPSHOT" REQUIRED="true"/>
       <IMPORT NAME="commons-io" MODULE="commons-io-1.3.2.jar" MVN="mvn:org.talend.libraries/commons-io-1.3.2/6.0.0-SNAPSHOT" REQUIRED="true"/>
     </IMPORTS> 
   </CODEGENERATION>  

@@ -145,6 +145,22 @@ public class ContextLoader {
 		}
 	}
 	
+	public void replacePlaceHoldersInFileFilters() {
+		for (FileFilterConfig config : fileFilters) {
+			String pathFilter = config.getFilterOrName();
+			boolean changed = false;
+			for (Map.Entry<String, String> entry : valuePlaceholders.entrySet()) {
+				if (pathFilter.contains(entry.getKey())) {
+					changed = true;
+				}
+				pathFilter = pathFilter.replace(entry.getKey(), entry.getValue());
+			}
+			if (changed) {
+				config.setFilterOrName(pathFilter);
+			}
+		}
+	}
+	
 	private void loadProperties(FileFilterConfig config) throws Exception {
 		if (already_loaded == false) {
 			// get the files from the parent dir and filter them

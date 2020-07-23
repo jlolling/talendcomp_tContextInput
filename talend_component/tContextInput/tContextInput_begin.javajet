@@ -22,6 +22,7 @@
    INode node = (INode)codeGenArgument.getArgument();
    String cid = node.getUniqueName();
    boolean loadContext = "true".equals(ElementParameterParser.getValue(node, "__LOAD_CONTEXT_FILES__"));
+   boolean applyReplacementsToFilter = "true".equals(ElementParameterParser.getValue(node, "__APPLY_REPLACEMENTS_TO_FILTER__"));
    List<Map<String, String>> filterList = (List<Map<String,String>>) ElementParameterParser.getObjectValue(node, "__CONTEXT_FILE_FILTERS__");
    boolean decryptPasswords = "true".equals(ElementParameterParser.getValue(node, "__DECRYPT_PASSWORDS__"));
    boolean setMasterPw = "true".equals(ElementParameterParser.getValue(node, "__SET_MASTER_PASSWORD__"));
@@ -63,22 +64,40 @@
 <%	if (replacerList != null) {
    	for (Map<String, String> replacer : replacerList) {
    		String placeHolder = replacer.get("PLACEHOLDER");
-   		String value = replacer.get("VALUE"); %>
-   <%=cid%>.addValueReplacement(<%=placeHolder%>, <%=value%>);
+   		String value = replacer.get("VALUE"); 
+   		String convertMethod = replacer.get("VALUE_CASE_CHANGE"); %> 
+		{
+			String value = <%=value%>;
+<%   		if ("UPPERCASE".equals(convertMethod)) { %>
+			if (value != null) {
+				value = value.toUpperCase();
+			}
+<%   		} else if ("LOWERCASE".equals(convertMethod))  { %>
+			if (value != null) {
+				value = value.toLowerCase();
+			}
+<%   		} %>
+   		<%=cid%>.addValueReplacement(<%=placeHolder%>, value);
+		}
 <%   	}
 	}
 %>
+<%	if (loadContext) {
+	if (applyReplacementsToFilter) { %>
+	<%=cid%>.replacePlaceHoldersInFileFilters();
+<%	} %>
 	// load properties files
 	try {
 		<%=cid%>.loadProperties();
-<%	if (loadAsSingleton) { %>
+<%		if (loadAsSingleton) { %>
 		de.jlo.talendcomp.context.ContextLoader.preventFurtherJobsFromLoading();
-<%	} %>
+<%		} %>
 	} catch (Exception le) {
 		String message = "Load properties failed: " + le.getMessage();
 		globalMap.put("<%=cid%>_ERROR_MESSAGE", message);
 		throw new Exception(message, le);
 	}
+<%	} %>
 <%	IProcess process = node.getProcess();
 	IContextManager cm = process.getContextManager();
 	IContext ctx = cm.getDefaultContext();
