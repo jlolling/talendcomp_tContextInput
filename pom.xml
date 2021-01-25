@@ -3,6 +3,7 @@
   <groupId>de.jlo.talendcomp</groupId>
   <artifactId>jlo-talendcomp-contextinput</artifactId>
   <name>context-input</name>
+  <version>3.1</version>
 
 	<dependencies>
 		<dependency>
@@ -34,7 +35,7 @@
 				<configuration>
 					<copyFromSourceBaseDir>${project.basedir}/talend_component</copyFromSourceBaseDir>
 					<componentBaseDir>${project.basedir}/talend_component</componentBaseDir>
-					<studioUserComponentFolder>/Data/Talend/Studio/talend_user_components</studioUserComponentFolder>
+					<studioUserComponentFolder>/Users/jan/development/talend_user_components</studioUserComponentFolder>
 				</configuration>
 				<executions>
 					<execution>
@@ -49,5 +50,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<version>3.0</version>
 </project>

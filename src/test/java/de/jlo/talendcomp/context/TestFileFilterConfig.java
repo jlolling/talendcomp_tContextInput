@@ -26,7 +26,7 @@ public class TestFileFilterConfig {
 	
 	@Test
 	public void testFileFilterConfigWithoutWildcard() throws Exception {
-		String dir = "/Data/Talend/testdata/context/";
+		String dir = "/var/testdata/context/";
 		String filter = "context_includes.properties";
 		boolean ignoreMissing = true;
 		FileFilterConfig c = new FileFilterConfig(dir + filter, ignoreMissing);

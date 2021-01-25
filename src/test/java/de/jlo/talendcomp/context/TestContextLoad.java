@@ -10,7 +10,7 @@ public class TestContextLoad {
 	@Test
 	public void testContextLoadFilter() throws Exception {
 		ContextLoader loader = new ContextLoader();
-		loader.addFileFilter("/Data/Talend/testdata/context/*.properties", false);
+		loader.addFileFilter("/var/testdata/context/*.properties", false);
 		loader.loadProperties();
 		assertEquals(28, loader.countLoadedProperties());
 	}
@@ -18,7 +18,7 @@ public class TestContextLoad {
 	@Test
 	public void testContextCheckMissingFiles() throws Exception {
 		ContextLoader loader = new ContextLoader();
-		loader.addFileFilter("/Data/Talend/testdata/context/missing.properties", false);
+		loader.addFileFilter("/var/testdata/context/missing.properties", false);
 		try {
 			loader.loadProperties();
 			assertTrue("missing file not detected", false);
@@ -32,7 +32,7 @@ public class TestContextLoad {
 		ContextLoader loader = new ContextLoader();
 		loader.addValueReplacement("{{ph1}}", "ph1-value");
 		loader.addValueReplacement("{{ph2}}", "ph2-value");
-		loader.addFileFilter("/Data/Talend/testdata/context/placeholders.properties", false);
+		loader.addFileFilter("/var/testdata/context/placeholders.properties", false);
 		loader.loadProperties();
 		String expected = "value ph1-value ph2-value";
 		String actual = loader.getValueAsString("key1", false, false);
@@ -42,7 +42,7 @@ public class TestContextLoad {
 	@Test
 	public void testContextLoadDir() throws Exception {
 		ContextLoader loader = new ContextLoader();
-		loader.addFileFilter("/Data/Talend/testdata/context/", false);
+		loader.addFileFilter("/var/testdata/context/", false);
 		loader.loadProperties();
 		for (String n : loader.getVariableNames()) {
 			System.out.println(n);
@@ -53,7 +53,7 @@ public class TestContextLoad {
 	@Test
 	public void testContextLoadWithIncludes() throws Exception {
 		ContextLoader loader = new ContextLoader();
-		loader.addFileFilter("/Data/Talend/testdata/context/context_includes.properties", false);
+		loader.addFileFilter("/var/testdata/context/context_includes.properties", false);
 		loader.setEnableIncludes(true);
 		loader.setIncludeKeyFilter("^file_");
 		loader.loadProperties();
@@ -66,7 +66,7 @@ public class TestContextLoad {
 	@Test
 	public void testContextLoadWithIncludesAndAdditionalVars() throws Exception {
 		ContextLoader loader = new ContextLoader();
-		loader.addFileFilter("/Data/Talend/testdata/context/context_includes.properties", false);
+		loader.addFileFilter("/var/testdata/context/context_includes.properties", false);
 		loader.setEnableIncludes(true);
 		loader.setIncludeKeyFilter("^file_");
 		loader.loadProperties();
