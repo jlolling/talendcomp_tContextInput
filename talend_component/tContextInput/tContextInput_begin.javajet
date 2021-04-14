@@ -33,8 +33,12 @@
    boolean allowFileIncludes = "true".equals(ElementParameterParser.getValue(node, "__ALLOW_FILE_INCLUDES__"));
    boolean loadAsSingleton = "true".equals(ElementParameterParser.getValue(node, "__LOAD_SINGLETON__"));
    List<Map<String, String>> replacerList = (List<Map<String,String>>) ElementParameterParser.getObjectValue(node, "__PARAM_REPLACEMENT__");
-   String fileIncludePattern = ElementParameterParser.getValue(node, "__FILE_INCLUDE_KEY_PATTERN__"); %>
-   System.out.println("Context: " + contextStr);
+   String fileIncludePattern = ElementParameterParser.getValue(node, "__FILE_INCLUDE_KEY_PATTERN__");
+   boolean printOnlyThisJobsVars = "true".equals(ElementParameterParser.getValue(node, "__PRINT_ONLY_FOR_CURR_JOB__"));
+   boolean printOnlyPromptVars = "true".equals(ElementParameterParser.getValue(node, "__PRINT_ONLY_PROMPT__"));
+   boolean forceLoading = "true".equals(ElementParameterParser.getValue(node, "__FORCE_LOADING__"));
+%>
+    System.out.println("########## Job: " + jobName + " Version: " + jobVersion + " Context: " + contextStr + " ##########");
 <%	if (setMasterPw) { %>
 	{
 		String masterPwd = <%=masterPw%>;
@@ -43,8 +47,12 @@
 		}
 	}
 <%	} %>
-   de.jlo.talendcomp.context.ContextLoader <%=cid%> = new de.jlo.talendcomp.context.ContextLoader();
+    de.jlo.talendcomp.context.ContextLoader <%=cid%> = new de.jlo.talendcomp.context.ContextLoader();
 <%	if (loadContext) { %>
+    <%=cid%>.setForceLoading(<%=forceLoading%>);
+   	if (<%=cid%>.contextLoadAlreadyDone() == false) {
+   		System.out.println("Will perform context load...");
+   	}
 	<%=cid%>.setDecryptPasswords(<%=decryptPasswords%>);
 <%		if (allowFileIncludes) { %>
 	<%=cid%>.setEnableIncludes(true);
@@ -55,10 +63,10 @@
    		for (Map<String, String> config : filterList) {
    			String fileFilter = config.get("FILE_FILTER");
    			boolean ignoreMissing = "true".equals(config.get("IGNORE_MISSING")); %>
-   <%=cid%>.addFileFilter(<%=fileFilter%>, <%=ignoreMissing%>);	
+    <%=cid%>.addFileFilter(<%=fileFilter%>, <%=ignoreMissing%>);	
 <%   		}
 		}
-   }
+    }
 %>
 	// add value replacements
 <%	if (replacerList != null) {
@@ -88,7 +96,8 @@
 <%	} %>
 	// load properties files
 	try {
-		<%=cid%>.loadProperties();
+		boolean loaded = <%=cid%>.loadProperties();
+		globalMap.put("<%=cid%>_CONTEXT_LOADED", loaded);
 <%		if (loadAsSingleton) { %>
 		de.jlo.talendcomp.context.ContextLoader.preventFurtherJobsFromLoading();
 <%		} %>
@@ -166,6 +175,16 @@
 			<%=contextVarConnName%>.VAR_VALUE = de.jlo.talendcomp.context.TypeUtil.toString(param.getValue());
 		}
 		<%=contextVarConnName%>.CONFIGURED_IN_CURR_JOB = param.isConfigured();
+<%		if (printOnlyThisJobsVars) { %>
+		if (<%=contextVarConnName%>.CONFIGURED_IN_CURR_JOB == false) {
+			continue;
+		}
+<%		} %>
 		<%=contextVarConnName%>.IS_PROMPT = param.isPrompt();
+<%		if (printOnlyPromptVars) { %>
+		if (<%=contextVarConnName%>.IS_PROMPT == false) {
+			continue;
+		}
+<%		} %>
 		<%=contextVarConnName%>.SOURCE_FILE = (param.getSourceFile() != null ? param.getSourceFile() : "");
 <%	} %>

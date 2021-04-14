@@ -25,6 +25,7 @@ public class ContextLoader {
 	private List<ContextParameter> jobContextParameters = new ArrayList<>();
 	private static boolean already_loaded = false;
 	private Map<String, String> valuePlaceholders = new HashMap<>();
+	private boolean forceLoading = false;
 	
 	public static void preventFurtherJobsFromLoading() {
 		already_loaded = true;
@@ -39,8 +40,8 @@ public class ContextLoader {
 		}
 	}
 	
-	public static boolean contextLoadAlreadyDone() {
-		return already_loaded;
+	public boolean contextLoadAlreadyDone() {
+		return already_loaded && forceLoading == false;
 	}
 	
 	public String applyValueReplacements(String variableName, String strValue) {
@@ -139,9 +140,17 @@ public class ContextLoader {
 		}
 	}
 	
-	public void loadProperties() throws Exception {
-		for (FileFilterConfig config : fileFilters) {
-			loadProperties(config);
+	public boolean loadProperties() throws Exception {
+		if (contextLoadAlreadyDone() == false) {
+			boolean loaded = false;
+			for (FileFilterConfig config : fileFilters) {
+				if (loadProperties(config)) {
+					loaded = true;
+				}
+			}
+			return loaded;
+		} else {
+			return false;
 		}
 	}
 	
@@ -161,24 +170,25 @@ public class ContextLoader {
 		}
 	}
 	
-	private void loadProperties(FileFilterConfig config) throws Exception {
-		if (already_loaded == false) {
-			// get the files from the parent dir and filter them
-			File dir = config.getDir();
-			File[] files = dir.listFiles(config.getFileFilter());
-			if (files != null) {
-				if (config.isIgnoreMissing() == false && files.length == 0) {
-					throw new Exception("File filter: " + config + " does not find files and is configured as do not ignore missing files.");
-				}
-				for (File file : files) {
-					loadProperties(config, file);
-				}
-			} else {
-				if (config.isIgnoreMissing() == false) {
-					throw new Exception("File filter: " + config + " does not find files and is configured as do not ignore missing files.");
-				}
+	private boolean loadProperties(FileFilterConfig config) throws Exception {
+		boolean loaded = false;
+		// get the files from the parent dir and filter them
+		File dir = config.getDir();
+		File[] files = dir.listFiles(config.getFileFilter());
+		if (files != null) {
+			if (config.isIgnoreMissing() == false && files.length == 0) {
+				throw new Exception("File filter: " + config + " does not find files and is configured as do not ignore missing files.");
+			}
+			for (File file : files) {
+				loadProperties(config, file);
+				loaded = true;
+			}
+		} else {
+			if (config.isIgnoreMissing() == false) {
+				throw new Exception("File filter: " + config + " does not find files and is configured as do not ignore missing files.");
 			}
 		}
+		return loaded;
 	}
 	
 	private void loadProperties(FileFilterConfig parentConfig, File file) throws Exception {
@@ -232,8 +242,10 @@ public class ContextLoader {
 		return enableIncludes;
 	}
 
-	public void setEnableIncludes(boolean enableIncludes) {
-		this.enableIncludes = enableIncludes;
+	public void setEnableIncludes(Boolean enableIncludes) {
+		if (enableIncludes != null) {
+			this.enableIncludes = enableIncludes;
+		}
 	}
 	
 	private boolean checkIfKeyIsIncludeKey(String key) {
@@ -363,8 +375,20 @@ public class ContextLoader {
 		return decryptPasswords;
 	}
 
-	public void setDecryptPasswords(boolean decryptPasswords) {
-		this.decryptPasswords = decryptPasswords;
+	public void setDecryptPasswords(Boolean decryptPasswords) {
+		if (decryptPasswords != null) {
+			this.decryptPasswords = decryptPasswords;
+		}
+	}
+
+	public boolean isForceLoading() {
+		return forceLoading;
+	}
+
+	public void setForceLoading(Boolean forceLoading) {
+		if (forceLoading != null) {
+			this.forceLoading = forceLoading;
+		}
 	}
 
 }
