@@ -169,7 +169,7 @@
 		}
 <%	if (contextVarConnName != null) { %>
 		<%=contextVarConnName%>.VAR_NAME = param.getName();
-		if (<%=contextVarConnName%>.VAR_NAME.toLowerCase().contains("passw")) {
+		if (<%=contextVarConnName%>.VAR_NAME.toLowerCase().contains("passw") || <%=contextVarConnName%>.VAR_NAME.toLowerCase().contains("secret")) {
 			<%=contextVarConnName%>.VAR_VALUE = "********";
 		} else {
 			<%=contextVarConnName%>.VAR_VALUE = de.jlo.talendcomp.context.TypeUtil.toString(param.getValue());
