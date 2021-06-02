@@ -106,7 +106,7 @@ public class ContextLoader {
 			}
 			ContextParameter cp = new ContextParameter(propertyName);
 			cp.setConfigured(false);
-			cp.setValue(propertiesFromFiles.getProperty(propertyName));
+			cp.setValue(applyValueReplacements(propertyName, propertiesFromFiles.getProperty(propertyName)));
 			cp.setSourceFile(propertyFileMap.get(propertyName));
 			int index = jobContextParameters.indexOf(cp);
 			if (index == -1) {
