@@ -26,6 +26,7 @@ public class ContextLoader {
 	private static boolean already_loaded = false;
 	private Map<String, String> valuePlaceholders = new HashMap<>();
 	private boolean forceLoading = false;
+	private String contextPlaceHolderPrefix = "context.";
 	
 	public static void preventFurtherJobsFromLoading() {
 		already_loaded = true;
@@ -120,10 +121,20 @@ public class ContextLoader {
 		return jobContextParameters;
 	}
 	
+	private String replaceContextPlaceHolder(String value) {
+		
+		return value;
+	}
+	
 	public Object getContextParamValue(String key) {
 		for (ContextParameter p : jobContextParameters) {
 			if (p.getName().equals(key)) {
-				return p.getValue();
+				Object value = p.getValue();
+				if (value instanceof String) {
+					return replaceContextPlaceHolder((String) value);
+				} else {
+					return p.getValue();
+				}
 			}
 		}
 		return null;
