@@ -88,5 +88,9 @@ public class FileFilterConfig {
 	public String toString() {
 		return (dir.getAbsolutePath() + "/" + (filter != null ? filter : ""));
 	}
+
+	public void setDir(File dir) {
+		this.dir = dir;
+	}
 	
 }

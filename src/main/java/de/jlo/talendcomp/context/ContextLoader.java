@@ -26,7 +26,6 @@ public class ContextLoader {
 	private static boolean already_loaded = false;
 	private Map<String, String> valuePlaceholders = new HashMap<>();
 	private boolean forceLoading = false;
-	private String contextPlaceHolderPrefix = "context.";
 	
 	public static void preventFurtherJobsFromLoading() {
 		already_loaded = true;
@@ -168,15 +167,31 @@ public class ContextLoader {
 	public void replacePlaceHoldersInFileFilters() {
 		for (FileFilterConfig config : fileFilters) {
 			String pathFilter = config.getFilterOrName();
-			boolean changed = false;
-			for (Map.Entry<String, String> entry : valuePlaceholders.entrySet()) {
-				if (pathFilter.contains(entry.getKey())) {
-					changed = true;
+			if (pathFilter != null) {
+				boolean changed = false;
+				for (Map.Entry<String, String> entry : valuePlaceholders.entrySet()) {
+					if (pathFilter.contains(entry.getKey())) {
+						changed = true;
+					}
+					pathFilter = pathFilter.replace(entry.getKey(), entry.getValue());
 				}
-				pathFilter = pathFilter.replace(entry.getKey(), entry.getValue());
+				if (changed) {
+					config.setFilterOrName(pathFilter);
+				}
 			}
-			if (changed) {
-				config.setFilterOrName(pathFilter);
+			File dir = config.getDir();
+			if (dir != null) {
+				String path = dir.getAbsolutePath();
+				boolean changed = false;
+				for (Map.Entry<String, String> entry : valuePlaceholders.entrySet()) {
+					if (path.contains(entry.getKey())) {
+						changed = true;
+					}
+					path = path.replace(entry.getKey(), entry.getValue());
+				}
+				if (changed) {
+					config.setDir(new File(path));
+				}
 			}
 		}
 	}
