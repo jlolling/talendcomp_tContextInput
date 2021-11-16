@@ -26,6 +26,7 @@ public class ContextLoader {
 	private static boolean already_loaded = false;
 	private Map<String, String> valuePlaceholders = new HashMap<>();
 	private boolean forceLoading = false;
+	private TalendInternalPasswordDecryption talendInternalPasswordDecryption = null;
 	
 	public static void preventFurtherJobsFromLoading() {
 		already_loaded = true;
@@ -219,7 +220,17 @@ public class ContextLoader {
 	
 	private void loadProperties(FileFilterConfig parentConfig, File file) throws Exception {
 		Properties lp = new Properties();
-		lp.load(new FileInputStream(file));
+		FileInputStream fin = null;
+		try {
+			fin = new FileInputStream(file);
+			lp.load(fin);
+		} catch (Exception e) {
+			throw new Exception("Fail to read properties file: " + file.getAbsolutePath(), e);
+		} finally {
+			if (fin != null) {
+				fin.close();
+			}
+		}
 		// first load not includes
 		for (String propertyName : lp.stringPropertyNames()) {
 			if (propertyName == null || propertyName.trim().isEmpty()) {
@@ -228,8 +239,12 @@ public class ContextLoader {
 			if (checkIfKeyIsIncludeKey(propertyName) == false) {
 				String value = lp.getProperty(propertyName);
 				propertyFileMap.put(propertyName, file.getAbsolutePath());
-				if (decryptPasswords && propertyName.toLowerCase().contains("passwor")) {
-					value = TalendContextPasswordUtil.decryptPassword(value);
+				if (decryptPasswords && propertyName.toLowerCase().contains("pass")) {
+					if (value.startsWith("enc:") && talendInternalPasswordDecryption != null) {
+						value = talendInternalPasswordDecryption.decryptPassword(value);
+					} else {
+						value = TalendContextPasswordUtil.decryptPassword(value);
+					}
 				}
 				propertiesFromFiles.setProperty(propertyName, applyValueReplacements(propertyName, value));
 			}
@@ -415,6 +430,10 @@ public class ContextLoader {
 		if (forceLoading != null) {
 			this.forceLoading = forceLoading;
 		}
+	}
+
+	public void setTalendInternalPasswordDecryption(TalendInternalPasswordDecryption talendInternalPasswordDecryption) {
+		this.talendInternalPasswordDecryption = talendInternalPasswordDecryption;
 	}
 
 }

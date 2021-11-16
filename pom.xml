@@ -3,7 +3,7 @@
   <groupId>de.jlo.talendcomp</groupId>
   <artifactId>jlo-talendcomp-contextinput</artifactId>
   <name>context-input</name>
-  <version>4.0</version>
+  <version>5.0</version>
 
 	<dependencies>
 		<dependency>

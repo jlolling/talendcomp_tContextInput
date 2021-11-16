@@ -18,17 +18,18 @@
 	" 
 %>
 <% 
-	CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+   CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
    INode node = (INode)codeGenArgument.getArgument();
    String cid = node.getUniqueName();
    boolean loadContext = "true".equals(ElementParameterParser.getValue(node, "__LOAD_CONTEXT_FILES__"));
    boolean applyReplacementsToFilter = "true".equals(ElementParameterParser.getValue(node, "__APPLY_REPLACEMENTS_TO_FILTER__"));
    List<Map<String, String>> filterList = (List<Map<String,String>>) ElementParameterParser.getObjectValue(node, "__CONTEXT_FILE_FILTERS__");
    boolean decryptPasswords = "true".equals(ElementParameterParser.getValue(node, "__DECRYPT_PASSWORDS__"));
+   boolean enableTalendInternalDecryption = decryptPasswords && "true".equals(ElementParameterParser.getValue(node, "__ENABLE_TALEND_INTERNAL_PW_DECRYPTION__"));
    boolean setMasterPw = "true".equals(ElementParameterParser.getValue(node, "__SET_MASTER_PASSWORD__"));
    String masterPw = ElementParameterParser.getValue(node, "__MASTER_PASSWORD__");
    if (masterPw == null || masterPw.trim().isEmpty()) {
-   	masterPw = "null";
+   	   masterPw = "null";
    }
    boolean allowFileIncludes = "true".equals(ElementParameterParser.getValue(node, "__ALLOW_FILE_INCLUDES__"));
    boolean loadAsSingleton = "true".equals(ElementParameterParser.getValue(node, "__LOAD_SINGLETON__"));
@@ -54,6 +55,14 @@
    		System.out.println("Will perform context load...");
    	}
 	<%=cid%>.setDecryptPasswords(<%=decryptPasswords%>);
+<%	if (decryptPasswords && enableTalendInternalDecryption) { %>
+	<%=cid%>.setTalendInternalPasswordDecryption(new de.jlo.talendcomp.context.TalendInternalPasswordDecryption() {
+		@Override
+		public String decryptPassword(String encryptedPassword) {
+			return routines.system.PasswordEncryptUtil.decryptPassword(encryptedPassword);
+		}
+	});
+<%	} %>
 <%		if (allowFileIncludes) { %>
 	<%=cid%>.setEnableIncludes(true);
 	<%=cid%>.setIncludeKeyFilter(<%=fileIncludePattern%>);

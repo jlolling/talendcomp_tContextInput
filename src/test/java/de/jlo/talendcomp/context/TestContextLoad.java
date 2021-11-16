@@ -12,7 +12,7 @@ public class TestContextLoad {
 		ContextLoader loader = new ContextLoader();
 		loader.addFileFilter("/var/testdata/context/*.properties", false);
 		loader.loadProperties();
-		assertEquals(28, loader.countLoadedProperties());
+		assertEquals(29, loader.countLoadedProperties());
 	}
 
 	@Test
@@ -47,7 +47,7 @@ public class TestContextLoad {
 		for (String n : loader.getVariableNames()) {
 			System.out.println(n);
 		}
-		assertEquals(31, loader.countLoadedProperties());
+		assertEquals(32, loader.countLoadedProperties());
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class TestContextLoad {
 		for (String n : loader.getVariableNames()) {
 			System.out.println(n);
 		}
-		assertEquals(17, loader.countLoadedProperties());
+		assertEquals(18, loader.countLoadedProperties());
 	}
 
 	@Test
@@ -75,8 +75,8 @@ public class TestContextLoad {
 		}
 		loader.addJobContextParameterValue("build_in_1", new Object(), false);
 		loader.setupContextParameters();
-		assertEquals(17, loader.countLoadedProperties());
-		assertEquals(18, loader.countJobContextVars());
+		assertEquals(18, loader.countLoadedProperties());
+		assertEquals(19, loader.countJobContextVars());
 	}
 
 }
