@@ -16,6 +16,15 @@ public class TestContextLoad {
 	}
 
 	@Test
+	public void testContextLoadFilterPath() throws Exception {
+		ContextLoader loader = new ContextLoader();
+		loader.addFileFilter("/var/testdata/context/*.properties", false);
+		loader.loadProperties();
+		String path = loader.getValueAsString("test_path",false,false);
+		assertEquals("path does not match", "c:\\test",  path);
+	}
+
+	@Test
 	public void testContextCheckMissingFiles() throws Exception {
 		ContextLoader loader = new ContextLoader();
 		loader.addFileFilter("/var/testdata/context/missing.properties", false);

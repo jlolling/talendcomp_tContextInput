@@ -38,8 +38,13 @@
    boolean printOnlyThisJobsVars = "true".equals(ElementParameterParser.getValue(node, "__PRINT_ONLY_FOR_CURR_JOB__"));
    boolean printOnlyPromptVars = "true".equals(ElementParameterParser.getValue(node, "__PRINT_ONLY_PROMPT__"));
    boolean forceLoading = "true".equals(ElementParameterParser.getValue(node, "__FORCE_LOADING__"));
-%>
+   boolean log4jEnabled = "true".equals(org.talend.core.model.process.ElementParameterParser.getValue(node.getProcess(), "__LOG4J_ACTIVATE__")) && 
+   							"JOBLET".equals(node.getComponent().getComponentType().toString()) == false;
+   if (log4jEnabled) { %>
+    log.info("########## Job: " + jobName + " Version: " + jobVersion + " Context: " + contextStr + " ##########");
+<% } else { %>
     System.out.println("########## Job: " + jobName + " Version: " + jobVersion + " Context: " + contextStr + " ##########");
+<% } %>
 <%	if (setMasterPw) { %>
 	{
 		String masterPwd = <%=masterPw%>;
@@ -63,10 +68,10 @@
 		}
 	});
 <%	} %>
-<%		if (allowFileIncludes) { %>
+<%	if (allowFileIncludes) { %>
 	<%=cid%>.setEnableIncludes(true);
 	<%=cid%>.setIncludeKeyFilter(<%=fileIncludePattern%>);
-<%		} %>
+<%	} %>
 	// add filter list
 <%		if (filterList != null) {
    		for (Map<String, String> config : filterList) {
