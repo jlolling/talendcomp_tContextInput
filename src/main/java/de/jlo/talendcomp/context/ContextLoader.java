@@ -63,7 +63,7 @@ public class ContextLoader {
 		}
 	}
 	
-	public ContextParameter addJobContextParameterValue(String key, Object value, boolean isPrompt) {
+	public ContextParameter addJobContextParameterValue(String key, Object value, boolean isPrompt, boolean password) {
 		if (key == null || key.trim().isEmpty()) {
 			throw new IllegalArgumentException("Adding context variables to the internal list failed: The key of the variable cannot be null or empty. The variable value was: " + value);
 		}
@@ -81,6 +81,7 @@ public class ContextLoader {
 		cp.setConfigured(true);
 		cp.setPrompt(isPrompt);
 		cp.setSourceFile(propertyFileMap.get(key));
+		cp.setPassword(password);
 		jobContextParameters.add(cp);
 		return cp;
 	}
@@ -131,7 +132,17 @@ public class ContextLoader {
 			if (p.getName().equals(key)) {
 				Object value = p.getValue();
 				if (value instanceof String) {
-					return replaceContextPlaceHolder((String) value);
+					String strValue = (String) value;
+					if (decryptPasswords && (p.isPassword() || p.getName().toLowerCase().contains("pass"))) {
+						if (strValue.startsWith("enc:") && talendInternalPasswordDecryption != null) {
+							strValue = talendInternalPasswordDecryption.decryptPassword(strValue);
+						} else {
+							strValue = TalendContextPasswordUtil.decryptPassword(strValue);
+						}
+						return strValue;
+					} else {
+						return replaceContextPlaceHolder((String) value);
+					}
 				} else {
 					return p.getValue();
 				}
@@ -239,6 +250,7 @@ public class ContextLoader {
 			if (checkIfKeyIsIncludeKey(propertyName) == false) {
 				String value = lp.getProperty(propertyName);
 				propertyFileMap.put(propertyName, file.getAbsolutePath());
+/* decryption moved to method getContextParamValue
 				if (decryptPasswords && propertyName.toLowerCase().contains("pass")) {
 					if (value.startsWith("enc:") && talendInternalPasswordDecryption != null) {
 						value = talendInternalPasswordDecryption.decryptPassword(value);
@@ -246,6 +258,7 @@ public class ContextLoader {
 						value = TalendContextPasswordUtil.decryptPassword(value);
 					}
 				}
+*/
 				propertiesFromFiles.setProperty(propertyName, applyValueReplacements(propertyName, value));
 			}
 		}
@@ -313,105 +326,6 @@ public class ContextLoader {
 		return jobContextParameters.size();
 	}
 	
-	public String getValueAsString(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		if (missingAllowed == false && propertiesFromFiles.containsKey(key) == false) {
-			throw new Exception("Variable: " + key + " not not available in the loaded context variables but configured as mandatory!");
-		}
-		String value = propertiesFromFiles.getProperty(key);
-		if (value == null && nullAllowed == false) {
-			throw new Exception("Variable: " + key + " is null but null is not allowed!");
-		}
-		return value;
-	}
-	
-	public Integer getValueAsInteger(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		String value = getValueAsString(key, nullAllowed, missingAllowed);
-		Integer ret = null;
-		try {
-			ret = Integer.parseInt(value);
-		} catch (NumberFormatException nfe) {
-			throw new Exception("Get variable: " + key + " failed while converting value: " + value + " to Integer!", nfe);
-		}
-		return ret;
-	}
-	
-	public Long getValueAsLong(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		String value = getValueAsString(key, nullAllowed, missingAllowed);
-		Long ret = null;
-		try {
-			ret = Long.parseLong(value);
-		} catch (NumberFormatException nfe) {
-			throw new Exception("Get variable: " + key + " failed while converting value: " + value + " to Long!", nfe);
-		}
-		return ret;
-	}
-	
-	public Double getValueAsDouble(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		String value = getValueAsString(key, nullAllowed, missingAllowed);
-		Double ret = null;
-		try {
-			ret = Double.parseDouble(value);
-		} catch (Exception nfe) {
-			throw new Exception("Get variable: " + key + " failed while converting value: " + value + " to Double!", nfe);
-		}
-		return ret;
-	}
-
-	public Float getValueAsFloat(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		String value = getValueAsString(key, nullAllowed, missingAllowed);
-		Float ret = null;
-		try {
-			ret = Float.parseFloat(value);
-		} catch (Exception nfe) {
-			throw new Exception("Get variable: " + key + " failed while converting value: " + value + " to Float!", nfe);
-		}
-		return ret;
-	}
-
-	public Short getValueAsShort(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		String value = getValueAsString(key, nullAllowed, missingAllowed);
-		Short ret = null;
-		try {
-			ret = Short.parseShort(value);
-		} catch (Exception nfe) {
-			throw new Exception("Get variable: " + key + " failed while converting value: " + value + " to Short!", nfe);
-		}
-		return ret;
-	}
-
-	public Boolean getValueAsBoolean(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		String value = getValueAsString(key, nullAllowed, missingAllowed);
-		Boolean ret = null;
-		try {
-			ret = Boolean.parseBoolean(value);
-		} catch (Exception nfe) {
-			throw new Exception("Get variable: " + key + " failed while converting value: " + value + " to Boolean!", nfe);
-		}
-		return ret;
-	}
-
-	public Date getValueAsDate(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		String value = getValueAsString(key, nullAllowed, missingAllowed);
-		Date ret = null;
-		try {
-			ret = GenericDateUtil.parseDate(value);
-		} catch (Exception nfe) {
-			throw new Exception("Get variable: " + key + " failed while converting value: " + value + " to Date!", nfe);
-		}
-		return ret;
-	}
-
-	public BigDecimal getValueAsBigDecimal(String key, boolean nullAllowed, boolean missingAllowed) throws Exception {
-		String value = getValueAsString(key, nullAllowed, missingAllowed);
-		BigDecimal ret = null;
-		try {
-			ret = new BigDecimal(value);
-		} catch (Exception nfe) {
-			throw new Exception("Get variable: " + key + " failed while converting value: " + value + " to BigDecimal!", nfe);
-		}
-		return ret;
-	}
-
 	public boolean isDecryptPasswords() {
 		return decryptPasswords;
 	}
