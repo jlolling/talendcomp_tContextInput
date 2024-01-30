@@ -133,9 +133,9 @@
 	// load job internal context vars and replace job values with loaded values
 <%	for (IContextParameter param : ctxParamList) { %>
 	try { // context variable: <%=param.getName()%>
-		<%=cid%>.addJobContextParameterValue("<%=param.getName()%>", context.<%=param.getName()%>, <%=param.isPromptNeeded()%>);
+		<%=cid%>.addJobContextParameterValue("<%=param.getName()%>", context.<%=param.getName()%>, <%=param.isPromptNeeded()%>, param.getType().contains("Password"));
    	if (<%=cid%>.isPropertyValueLoadedFromFile("<%=param.getName()%>")) {
-<% 	if (param.getType().contains("Date")) { %>
+<% 	    if (param.getType().contains("Date")) { %>
 			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToDate(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
 <%		} else if (param.getType().contains("Int")) { %>
 			context.<%=param.getName()%> = de.jlo.talendcomp.context.TypeUtil.convertToInteger(<%=cid%>.getContextParamValue("<%=param.getName()%>"));
