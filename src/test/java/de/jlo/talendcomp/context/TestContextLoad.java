@@ -20,7 +20,7 @@ public class TestContextLoad {
 		ContextLoader loader = new ContextLoader();
 		loader.addFileFilter("/var/testdata/context/*.properties", false);
 		loader.loadProperties();
-		String path = loader.getValueAsString("test_path",false,false);
+		String path = (String) loader.getContextParamValue("test_path");
 		assertEquals("path does not match", "c:\\test",  path);
 	}
 
@@ -44,7 +44,7 @@ public class TestContextLoad {
 		loader.addFileFilter("/var/testdata/context/placeholders.properties", false);
 		loader.loadProperties();
 		String expected = "value ph1-value ph2-value";
-		String actual = loader.getValueAsString("key1", false, false);
+		String actual = (String) loader.getContextParamValue("key1");
 		assertEquals("Value wrong", expected, actual);
 	}
 
@@ -82,7 +82,7 @@ public class TestContextLoad {
 		for (String n : loader.getVariableNames()) {
 			System.out.println(n);
 		}
-		loader.addJobContextParameterValue("build_in_1", new Object(), false);
+		loader.addJobContextParameterValue("build_in_1", new Object(), false, false);
 		loader.setupContextParameters();
 		assertEquals(20, loader.countLoadedProperties());
 		assertEquals(21, loader.countJobContextVars());
