@@ -1,0 +1,6 @@
+<%@ jet 
+	imports="
+		org.talend.core.model.process.INode 
+	" 
+%>
+	} // close for loop
